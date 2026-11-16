@@ -73,6 +73,8 @@ describe("parseTaskForm", () => {
   it("uses a preset or custom category", () => {
     const preset = parseTaskForm(values({ categoryChoice: "Health" }));
     expect(preset.ok && preset.data.category).toBe("Health");
+    const research = parseTaskForm(values({ categoryChoice: "Research" }));
+    expect(research.ok && research.data.category).toBe("Research");
     const custom = parseTaskForm(values({ categoryChoice: "custom", categoryCustom: " Garden " }));
     expect(custom.ok && custom.data.category).toBe("Garden");
     const emptyCustom = parseTaskForm(values({ categoryChoice: "custom", categoryCustom: " " }));

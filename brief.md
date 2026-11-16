@@ -14,7 +14,7 @@ Just me, one person, almost always on my phone. There are no accounts and no sha
 2. **Streak.** A big number at the top of Today, with a "Done today" status once one task is done, and whether this week's free skip is used.
 3. **Backlog tab.** One-time tasks with no date or a future date. Each has "Do today" (moves it onto today's list) and a check-off. Repeating tasks are listed below for editing.
 4. **Done tab.** Check-offs from the last 30 days, grouped by day (Today, Yesterday, then dates). Today's can be undone.
-5. **Add and edit tasks.** Name (required), repeats (one-time, daily, weekly on chosen days), due date (one-time) or start date (repeating), time of day, category (none, Health, Chores, Errands or custom) and notes. Delete with a confirm step.
+5. **Add and edit tasks.** Name (required), repeats (one-time, daily, weekly on chosen days), due date (one-time) or start date (repeating), time of day, category (none, Health, Chores, Errands, Research or custom) and notes. Delete with a confirm step.
 6. **Home screen install.** Web app manifest and icon.
 
 ## Rules
@@ -81,7 +81,8 @@ FEATURES
    Weekly (at least one required); a date field labelled "Due date" for one-time
    (empty = backlog) or "Starts on" for repeating, with Today / Tomorrow / Clear
    shortcuts; Time of day pills (Morning, Afternoon, Evening, Anytime; default
-   Anytime); Category pills (None, Health, Chores, Errands, Other + text field, max 40);
+   Anytime); Category pills (None, Health, Chores, Errands, Research, Other + text
+   field, max 40);
    Notes (max 2000). Visible labels, server-side validation with zod, inline errors
    with aria-invalid, an error summary, and focus moves to the first invalid field.
    Don't let React reset the form after a failed submit. Delete with an in-page

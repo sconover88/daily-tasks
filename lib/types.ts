@@ -53,4 +53,4 @@ export const WEEKDAY_LONG = [
 /** Weekday order shown in the form: the week starts on Monday, like the streak. */
 export const WEEKDAY_FORM_ORDER = [1, 2, 3, 4, 5, 6, 0] as const;
 
-export const PRESET_CATEGORIES = ["Health", "Chores", "Errands"] as const;
+export const PRESET_CATEGORIES = ["Health", "Chores", "Errands", "Research"] as const;
