@@ -89,7 +89,7 @@ FEATURES
 6. Bottom navigation fixed in thumb reach: a surface pill with Today / Backlog / Done
    (active tab filled, aria-current="page") plus a round "+" Add task button.
    Respect the iPhone safe area.
-7. Web app manifest + PNG icons (generated with next/og: a white check on #111113)
+7. Web app manifest + PNG icons (generated with next/og: a white check on #542177)
    so it can be added to the home screen. Apple touch icon. No service worker.
 
 RULES
@@ -140,7 +140,7 @@ DATA AND SECURITY
 DESIGN
 Create DESIGN.md at the project root recording these exact specs, then the app rules
 below. Implement the tokens as CSS variables mapped into Tailwind's @theme.
-- Colour. Background: #fcfcfd; Brand colour: #2563eb; Button colour: #111113; Brand
+- Colour. Background: #fcfcfd; Brand colour: #2563eb; Button colour: #542177; Brand
   colour use: None; Where colour appears: Status only (keep images neutral; use colour
   only for status, such as success or error).
 - Type. Two sans-serif fonts: Host Grotesk for display, Instrument Sans for body;
@@ -151,7 +151,7 @@ below. Implement the tokens as CSS variables mapped into Tailwind's @theme.
 - Imagery. UI only (no photography); framed.
 - Starting values: page ground #fcfcfd; alternate ground #f4f3f4; primary text
   #141314; secondary text #454545; muted text #5c5c5c; inverse ground #141314; inverse
-  text #fcfcfd; accent #2563eb; primary action fill #111113; primary action label
+  text #fcfcfd; accent #2563eb; primary action fill #542177; primary action label
   #fcfcfd; surface #f4f3f4; hairline #dddddd; display type at 1440px: 80px; display
   type at 390px: 60px; body type 16px; display weight 500; container width 1200px;
   page margin 24px; band padding at 1440px top 96px / bottom 64px; band padding at
@@ -160,7 +160,7 @@ below. Implement the tokens as CSS variables mapped into Tailwind's @theme.
 App rules:
 - One background everywhere; cards inset on the surface with 16px corners; no
   dividers (separate with space and surfaces); every control is a pill or circle.
-- Primary action = #111113 fill with a #fcfcfd label (main buttons, add button, active
+- Primary action = #542177 fill with a #fcfcfd label (main buttons, add button, active
   tab, selected pills, checked boxes). The accent blue is ONLY for the "Done today"
   status. Errors use an accessible red, #991b1b.
 - Inputs and unselected pills need a 3:1 outline: add a "control edge" token

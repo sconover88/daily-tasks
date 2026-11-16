@@ -41,6 +41,14 @@ The design contract for Daily Tasks. Every new screen reads this first and match
 
 Every text pairing among them clears WCAG AA and APCA Lc 75. Keep that true.
 
+## Changes from the starting values
+
+| Token | Was | Now | Why |
+|---|---|---|---|
+| primary action fill (button colour) | #111113 | **#542177** | Owner's choice: a deep purple as the main colour. Label stays #fcfcfd (11.01:1). |
+
+Everything below uses the new value.
+
 ## What the app adds
 
 Two tokens, both needed for accessibility:
@@ -54,8 +62,8 @@ Two tokens, both needed for accessibility:
 
 **Colour**
 - One background: the page ground, everywhere. Cards are inset on the surface (#f4f3f4). There are no dividers anywhere. Space and surfaces separate things.
-- The primary action is #111113 with a #fcfcfd label. This is the main button, the add button, the active tab, selected pills and checked boxes.
-- The blue accent (#2563eb) is status only, and rare. It's used for the **"Done today"** badge (daily goal met). Nothing decorative is blue. A checked box is ink, not blue, so the badge stays the one blue signal on the screen.
+- The primary action is #542177 (purple) with a #fcfcfd label. This is the main button, the add button, the active tab, selected pills and checked boxes.
+- The blue accent (#2563eb) is status only, and rare. It's used for the **"Done today"** badge (daily goal met). Nothing decorative is blue. A checked box is purple, not blue, so the badge stays the one blue signal on the screen.
 - Danger red is status only. It's used for errors, "Overdue" and the destructive confirm button.
 
 **Type**
@@ -84,7 +92,7 @@ Two tokens, both needed for accessibility:
 - Only colour and press feedback (about 150ms) and the loading pulse. With `prefers-reduced-motion`, these are effectively off.
 
 **Imagery**
-- There's no photography. The app icon is a white check on #111113.
+- There's no photography. The app icon is a white check on #542177.
 
 ## Measured contrast
 
@@ -98,7 +106,7 @@ These come from `npm run contrast`, which computes the actual hex pairings the a
 | Secondary text `#454545` | Surface `#f4f3f4` | 16px / 400 | 8.66:1 | Lc 85.2 |
 | Muted text `#5c5c5c` | Page ground `#fcfcfd` | 14px / 500 | 6.52:1 | Lc 81.3 |
 | Muted text `#5c5c5c` | Surface `#f4f3f4` | 13px / 400 | 6.04:1 | Lc 76.1 |
-| Action label `#fcfcfd` | Action fill `#111113` | 14–16px / 500 | 18.40:1 | Lc -105.4 |
+| Action label `#fcfcfd` | Action fill `#542177` | 14–16px / 500 | 11.01:1 | Lc -97.3 |
 | Inverse text `#fcfcfd` | Accent `#2563eb` (Done today) | 14px / 600 | 5.04:1 | Lc -78.3 |
 | Danger text `#991b1b` | Page ground `#fcfcfd` | 14px / 500 | 8.10:1 | Lc 85.3 |
 | Danger text `#991b1b` | Surface `#f4f3f4` | 13px / 600 | 7.51:1 | Lc 80.1 |
@@ -108,7 +116,7 @@ These come from `npm run contrast`, which computes the actual hex pairings the a
 |---|---|---|
 | Control edge `#858585` | Page ground `#fcfcfd` | 3.60:1 |
 | Control edge `#858585` | Surface `#f4f3f4` | 3.33:1 |
-| Checked fill `#111113` | Surface `#f4f3f4` | 17.04:1 |
+| Checked fill `#542177` | Surface `#f4f3f4` | 10.20:1 |
 | Focus ring `#141314` | Page ground `#fcfcfd` | 18.08:1 |
 | Focus ring `#141314` | Surface `#f4f3f4` | 16.75:1 |
 
