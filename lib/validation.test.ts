@@ -10,6 +10,7 @@ function values(overrides: Partial<TaskFormValues> = {}): TaskFormValues {
     time_of_day: "morning",
     repeat: "daily",
     weekdays: [],
+    times_per_week: "",
     due_date: "",
     ...overrides,
   };
@@ -27,6 +28,7 @@ describe("parseTaskForm", () => {
         time_of_day: "morning",
         repeat: "daily",
         weekdays: [],
+        times_per_week: null,
         due_date: null,
       },
     });
@@ -44,10 +46,24 @@ describe("parseTaskForm", () => {
     if (!result.ok) expect(result.errors.title).toMatch(/200/);
   });
 
-  it("needs at least one day for weekly tasks", () => {
-    const result = parseTaskForm(values({ repeat: "weekly", weekdays: [] }));
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors.weekdays).toBe("Pick at least one day.");
+  it("accepts weekly with no days as N times a week", () => {
+    const result = parseTaskForm(values({ repeat: "weekly", weekdays: [], times_per_week: "2" }));
+    expect(result.ok && result.data).toMatchObject({ repeat: "weekly", weekdays: [], times_per_week: 2 });
+  });
+
+  it("needs a valid times-a-week count when no days are picked", () => {
+    for (const times of ["", "0", "8", "1.5", "lots"]) {
+      const result = parseTaskForm(values({ repeat: "weekly", weekdays: [], times_per_week: times }));
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.errors.times_per_week).toBe("Pick how many times a week.");
+    }
+  });
+
+  it("ignores times a week when days are picked, or for other repeats", () => {
+    const withDays = parseTaskForm(values({ repeat: "weekly", weekdays: ["1"], times_per_week: "3" }));
+    expect(withDays.ok && withDays.data.times_per_week).toBe(null);
+    const daily = parseTaskForm(values({ repeat: "daily", times_per_week: "3" }));
+    expect(daily.ok && daily.data.times_per_week).toBe(null);
   });
 
   it("dedupes and sorts weekdays", () => {
@@ -101,6 +117,7 @@ describe("readTaskForm", () => {
       time_of_day: "evening",
       repeat: "weekly",
       weekdays: ["0", "3"],
+      times_per_week: "",
       due_date: "2026-11-15",
     });
   });

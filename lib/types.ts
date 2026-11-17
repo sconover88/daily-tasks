@@ -17,6 +17,11 @@ export type Task = {
   repeat: Repeat;
   /** 0 = Sunday ... 6 = Saturday. Only used when repeat = "weekly". */
   weekdays: number[] | null;
+  /**
+   * Weekly tasks with no chosen days: how many times to do it each Mon–Sun week (1–7).
+   * Null for every other kind of task.
+   */
+  times_per_week: number | null;
   /** One-time: when it's due. Repeating: optional start date. */
   due_date: DateString | null;
   /** Set when a one-time task is finished. Repeating tasks never set this. */

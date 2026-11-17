@@ -14,18 +14,35 @@ create table if not exists public.tasks (
                 check (time_of_day in ('morning', 'afternoon', 'evening', 'anytime')),
   repeat        text not null default 'none'
                 check (repeat in ('none', 'daily', 'weekly')),
-  -- 0 = Sunday ... 6 = Saturday. Required (non-empty) for weekly tasks.
+  -- 0 = Sunday ... 6 = Saturday. For weekly tasks on set days.
   weekdays      smallint[]
                 check (weekdays is null or weekdays <@ array[0,1,2,3,4,5,6]::smallint[]),
+  -- For weekly tasks with no set days: how many times each Mon–Sun week.
+  times_per_week smallint
+                check (times_per_week is null or times_per_week between 1 and 7),
   -- One-time: the due date. Repeating: an optional start date.
   due_date      date,
   -- Set when a one-time task is finished. Repeating tasks leave this empty.
   completed_at  timestamptz,
   created_at    timestamptz not null default now(),
   constraint weekly_needs_days check (
-    repeat <> 'weekly' or (weekdays is not null and cardinality(weekdays) > 0)
+    repeat <> 'weekly'
+    or (weekdays is not null and cardinality(weekdays) > 0)
+    or times_per_week is not null
   ),
   constraint only_one_time_tasks_finish check (repeat = 'none' or completed_at is null)
+);
+
+-- Upgrades for databases created before "times a week" existed (same as
+-- supabase/migrations/002_flexible_weekly.sql). Harmless on a fresh database.
+alter table public.tasks
+  add column if not exists times_per_week smallint
+  check (times_per_week is null or times_per_week between 1 and 7);
+alter table public.tasks drop constraint if exists weekly_needs_days;
+alter table public.tasks add constraint weekly_needs_days check (
+  repeat <> 'weekly'
+  or (weekdays is not null and cardinality(weekdays) > 0)
+  or times_per_week is not null
 );
 
 -- One row per task per day it was done. Drives the streak and the Done tab.

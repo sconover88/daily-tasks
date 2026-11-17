@@ -14,12 +14,14 @@ Just me, one person, almost always on my phone. There are no accounts and no sha
 2. **Streak.** A big number at the top of Today, with a "Done today" status once one task is done, and whether this week's free skip is used.
 3. **Backlog tab.** One-time tasks with no date or a future date. Each has "Do today" (moves it onto today's list) and a check-off. Repeating tasks are listed below for editing.
 4. **Done tab.** Check-offs from the last 30 days, grouped by day (Today, Yesterday, then dates). Today's can be undone.
-5. **Add and edit tasks.** Name (required), repeats (one-time, daily, weekly on chosen days), due date (one-time) or start date (repeating), time of day, category (none, Health, Chores, Errands, Research or custom) and notes. Delete with a confirm step.
-6. **Home screen install.** Web app manifest and icon.
+5. **This week section.** At the bottom of Today: weekly tasks with no set day (for example "laundry twice a week"), each showing "1 of 2 this week". Check off on any day, once per day. Resets Monday.
+6. **Add and edit tasks.** Name (required), repeats (one-time, daily, weekly on chosen days, or weekly N times on any days), due date (one-time) or start date (repeating), time of day, category (none, Health, Chores, Errands, Research or custom) and notes. Delete with a confirm step.
+7. **Home screen install.** Web app manifest and icon.
 
 ## Rules
 
 - **Repeating tasks reset on schedule.** A daily task is due every day, and a weekly task on its chosen weekdays. Missed occurrences never pile up.
+- **Weekly with no days** means "N times a week (1–7), any days". It's never on a specific day's list. Progress counts this Monday–Sunday week's check-offs, at most one per day, and resets Monday. Missed weeks don't carry over. Check-offs count toward the streak.
 - **One-time tasks** with a date are due on and after that date (overdue after). Undated ones stay in the backlog. Finishing one removes it from the lists.
 - **Streak (forgiving).** A day counts if at least one task was completed. Each Monday–Sunday week allows one missed day, and a second miss in the same week resets the streak to 0. Today doesn't break the streak until it ends. Skipped days don't add to the count.
 - **Time zone.** "Today" is computed on the server in `APP_TIME_ZONE` (default `America/Denver`, or `America/Phoenix` for Arizona).
@@ -37,7 +39,7 @@ The look is recorded in `DESIGN.md`: one light background, inset cards on a ligh
 
 ## Data model
 
-- `tasks`: id, title, notes, category, time_of_day (morning, afternoon, evening, anytime), repeat (none, daily, weekly), weekdays smallint[] (0 = Sun), due_date, completed_at (one-time only) and created_at.
+- `tasks`: id, title, notes, category, time_of_day (morning, afternoon, evening, anytime), repeat (none, daily, weekly), weekdays smallint[] (0 = Sun), times_per_week smallint (1–7, weekly with no days only), due_date, completed_at (one-time only) and created_at.
 - `completions`: id, task_id (cascade delete), completed_on (date), completed_at. Unique per (task_id, completed_on).
 
 ---
@@ -77,8 +79,9 @@ FEATURES
    then "Nov 1"), with the time and category; "Undo" on today's items; a summary line
    ("12 tasks done on 9 of the last 30 days").
 5. Add/Edit task form (/tasks/new, /tasks/[id]): Task name (required, max 200);
-   Repeats (One-time / Daily / Weekly segmented pills); weekday pills Mon..Sun when
-   Weekly (at least one required); a date field labelled "Due date" for one-time
+   Repeats (One-time / Daily / Weekly segmented pills); optional weekday pills
+   Mon..Sun when Weekly; when Weekly with no days picked, a "How many times a week"
+   row of 1x..7x pills (default 1); a date field labelled "Due date" for one-time
    (empty = backlog) or "Starts on" for repeating, with Today / Tomorrow / Clear
    shortcuts; Time of day pills (Morning, Afternoon, Evening, Anytime; default
    Anytime); Category pills (None, Health, Chores, Errands, Research, Other + text
@@ -90,13 +93,19 @@ FEATURES
 6. Bottom navigation fixed in thumb reach: a surface pill with Today / Backlog / Done
    (active tab filled, aria-current="page") plus a round "+" Add task button.
    Respect the iPhone safe area.
-7. Web app manifest + PNG icons (generated with next/og: a white check on #542177)
+7. "This week" section at the bottom of Today (hidden when empty): weekly tasks with
+   no set days, each with a today checkbox and "1 of 2 this week" or "Done for the
+   week · 2 of 2", plus "N to go" and "Any day works. Resets Monday."
+8. Web app manifest + PNG icons (generated with next/og: a white check on #542177)
    so it can be added to the home screen. Apple touch icon. No service worker.
 
 RULES
 - Repeating tasks reset ON SCHEDULE: daily = every day; weekly = on chosen weekdays
   (0=Sun..6=Sat); an optional start date delays the first day. Missed days never
   pile up. Completing a repeating task inserts a completion for today only.
+- Weekly with no days = times_per_week (1-7), any days: never on a day's list; show
+  it in "This week" with the count of completions from this Monday to today; resets
+  each Monday; missed weeks don't carry over.
 - One-time tasks: due on/after their due date (overdue after), undated = backlog.
   Completing one sets completed_at and inserts a completion for today; undo deletes
   today's completion and clears completed_at.
@@ -118,8 +127,8 @@ DATA AND SECURITY
   tasks(id uuid pk default gen_random_uuid(), title text not null check 1-200 chars,
   notes text <=2000, category text 1-40, time_of_day text default 'anytime' check in
   (morning, afternoon, evening, anytime), repeat text default 'none' check in (none,
-  daily, weekly), weekdays smallint[] subset of 0..6 and non-empty when weekly,
-  due_date date, completed_at timestamptz (only when repeat='none'), created_at
+  daily, weekly), weekdays smallint[] subset of 0..6, times_per_week smallint 1-7;
+  weekly needs non-empty weekdays OR times_per_week; due_date date, completed_at timestamptz (only when repeat='none'), created_at
   timestamptz default now());
   completions(id uuid pk, task_id uuid references tasks on delete cascade,
   completed_on date not null, completed_at timestamptz default now(),

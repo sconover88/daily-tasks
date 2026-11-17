@@ -31,7 +31,7 @@ const REPEAT_OPTIONS: { value: Repeat; label: string }[] = [
   { value: "weekly", label: "Weekly" },
 ];
 
-const FIELD_ORDER: TaskField[] = ["title", "repeat", "weekdays", "due_date", "time_of_day", "category", "notes"];
+const FIELD_ORDER: TaskField[] = ["title", "repeat", "weekdays", "times_per_week", "due_date", "time_of_day", "category", "notes"];
 
 const inputClass =
   "block w-full rounded-control border border-edge bg-ground px-4 text-body text-ink placeholder:text-ink-muted aria-[invalid=true]:border-danger";
@@ -60,6 +60,7 @@ export default function TaskForm({ task, today, returnTo, cancelHref }: Props) {
   const [title, setTitle] = useState(task?.title ?? "");
   const [repeat, setRepeat] = useState<Repeat>(task?.repeat ?? "none");
   const [weekdays, setWeekdays] = useState<number[]>(task?.weekdays ?? []);
+  const [timesPerWeek, setTimesPerWeek] = useState(String(task?.times_per_week ?? 1));
   const [dueDate, setDueDate] = useState(task?.due_date ?? "");
   const [timeOfDay, setTimeOfDay] = useState<string>(task?.time_of_day ?? "anytime");
   const [categoryChoice, setCategoryChoice] = useState(category.choice);
@@ -147,8 +148,13 @@ export default function TaskForm({ task, today, returnTo, cancelHref }: Props) {
       </fieldset>
 
       {repeat === "weekly" ? (
-        <fieldset aria-describedby={errors.weekdays ? "weekdays-error" : undefined}>
-          <legend className="mb-2 font-medium text-ink">On these days</legend>
+        <fieldset aria-describedby={`weekdays-hint${errors.weekdays ? " weekdays-error" : ""}`}>
+          <legend className="mb-1 font-medium text-ink">
+            On these days <span className="font-normal text-ink-muted">(optional)</span>
+          </legend>
+          <p id="weekdays-hint" className="mb-2 text-small text-ink-muted">
+            Leave all days unpicked if any day works. It&apos;ll show under &quot;This week&quot; on Today.
+          </p>
           <div className="grid grid-cols-7 gap-1.5" data-field="weekdays" tabIndex={-1}>
             {WEEKDAY_FORM_ORDER.map((day) => (
               <PillOption
@@ -166,6 +172,29 @@ export default function TaskForm({ task, today, returnTo, cancelHref }: Props) {
             ))}
           </div>
           <FieldError id="weekdays-error" message={errors.weekdays} />
+        </fieldset>
+      ) : null}
+
+      {repeat === "weekly" && weekdays.length === 0 ? (
+        <fieldset aria-describedby={errors.times_per_week ? "times_per_week-error" : undefined}>
+          <legend className="mb-2 font-medium text-ink">How many times a week</legend>
+          <div className="grid grid-cols-7 gap-1.5" data-field="times_per_week" tabIndex={-1}>
+            {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+              <PillOption
+                key={n}
+                type="radio"
+                name="times_per_week"
+                value={String(n)}
+                checked={timesPerWeek === String(n)}
+                onChange={() => setTimesPerWeek(String(n))}
+                srLabel={n === 1 ? "Once a week" : `${n} times a week`}
+                className="[&_.pill]:px-0"
+              >
+                {`${n}×`}
+              </PillOption>
+            ))}
+          </div>
+          <FieldError id="times_per_week-error" message={errors.times_per_week} />
         </fieldset>
       ) : null}
 

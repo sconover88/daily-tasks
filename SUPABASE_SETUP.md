@@ -63,6 +63,20 @@ You'll add the keys when you import the project. See "Deploy to Vercel" in the R
 
 3. Save. `.env.local` is in `.gitignore`, so it never goes to GitHub.
 
+## Database updates
+
+When a new feature needs a database change, it comes as a file in `supabase/migrations/`. Run each one once, in number order, the same way you ran the schema:
+
+1. Open Supabase, click **SQL Editor**, then **New query**.
+2. Copy the whole migration file and paste it in.
+3. Click **Run**. You should see **"Success. No rows returned."**
+
+| File | Adds |
+|---|---|
+| `002_flexible_weekly.sql` | Weekly tasks with no set days ("N times a week") |
+
+Each one is safe to run twice and doesn't delete any tasks. If you're setting up a brand-new project, `schema.sql` already includes them, so you can skip this section.
+
 ## Why it's set up this way
 
 - Your phone never talks to Supabase directly. It talks to the app on Vercel, and only the app's server uses the secret key.

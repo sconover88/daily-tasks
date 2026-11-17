@@ -10,7 +10,8 @@ Built with Next.js, Supabase and Vercel.
 - **Streak:** days in a row with at least one task done. You get **one free missed day per week** (Monday to Sunday), and a second miss in the same week resets it to 0. Today never counts against you until it's over. A blue **Done today** badge appears once you've hit the goal.
 - **Backlog:** one-time tasks with no date or a future date. Tap **Do today** to pull one onto today's list. Your repeating tasks are listed here too so you can edit them.
 - **Done:** everything you've checked off in the last 30 days, grouped by day. Today's check-offs can be undone.
-- **Tasks** have a name, how often they repeat (one-time, daily, or weekly on chosen days), an optional due or start date, time of day, an optional category (Health, Chores, Errands, Research or your own) and notes.
+- **This week:** weekly tasks with no set day, like "laundry twice a week". They sit in their own section at the bottom of Today with progress ("1 of 2 this week"). Check one off on any day (once per day), and the count resets every Monday.
+- **Tasks** have a name, how often they repeat (one-time, daily, weekly on chosen days, or weekly N times on any days), an optional due or start date, time of day, an optional category (Health, Chores, Errands, Research or your own) and notes.
 - **Repeating tasks reset on schedule.** A daily task is fresh every morning, and missed days don't pile up.
 
 ## Privacy: please read

@@ -4,6 +4,7 @@ import type { TodayItem } from "@/lib/recurrence";
 import type { Task } from "@/lib/types";
 import StreakPanel from "./StreakPanel";
 import TodayGroups from "./TodayGroups";
+import WeeklySection from "./WeeklySection";
 
 vi.mock("@/app/actions", () => ({
   setTaskDone: vi.fn(async () => ({ ok: true })),
@@ -19,6 +20,7 @@ function task(overrides: Partial<Task>): Task {
     time_of_day: "anytime",
     repeat: "none",
     weekdays: null,
+    times_per_week: null,
     due_date: null,
     completed_at: null,
     created_at: "2026-11-01T12:00:00Z",
@@ -51,6 +53,32 @@ describe("TodayGroups", () => {
   it("flags overdue one-time tasks", () => {
     render(<TodayGroups items={items} today="2026-11-13" />);
     expect(screen.getByText("Overdue since Nov 10")).toBeInTheDocument();
+  });
+});
+
+describe("WeeklySection", () => {
+  const laundry = task({ id: "w1", title: "Laundry", repeat: "weekly", times_per_week: 2 });
+  const vacuum = task({ id: "w2", title: "Vacuum", repeat: "weekly", times_per_week: 1 });
+
+  it("shows this week's progress for each task", () => {
+    render(
+      <WeeklySection
+        items={[
+          { task: laundry, count: 1, target: 2, doneToday: true, complete: false },
+          { task: vacuum, count: 1, target: 1, doneToday: false, complete: true },
+        ]}
+      />,
+    );
+    const section = screen.getByRole("region", { name: "This week" });
+    expect(within(section).getByText("1 of 2 this week")).toBeInTheDocument();
+    expect(within(section).getByText("Done for the week · 1 of 1")).toBeInTheDocument();
+    expect(within(section).getByText("1 to go")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Laundry" })).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("renders nothing with no weekly tasks", () => {
+    const { container } = render(<WeeklySection items={[]} />);
+    expect(container).toBeEmptyDOMElement();
   });
 });
 

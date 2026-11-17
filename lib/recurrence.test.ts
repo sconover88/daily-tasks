@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   backlogTasks,
   buildTodayItems,
+  buildWeeklyItems,
   describeRepeat,
+  isFlexibleWeekly,
   groupByTimeOfDay,
   isDueOn,
   isOverdue,
@@ -22,6 +24,7 @@ function task(overrides: Partial<Task>): Task {
     time_of_day: "anytime",
     repeat: "none",
     weekdays: null,
+    times_per_week: null,
     due_date: null,
     completed_at: null,
     created_at: "2026-11-01T12:00:00Z",
@@ -98,6 +101,58 @@ describe("buildTodayItems", () => {
     const items = buildTodayItems([medicine], new Set(), SATURDAY);
     expect(items).toHaveLength(1);
     expect(items[0].done).toBe(false);
+  });
+});
+
+describe("flexible weekly tasks (no set days)", () => {
+  // Week of Mon Nov 9 – Sun Nov 15. FRIDAY is Nov 13.
+  const laundry = task({ id: "laundry", repeat: "weekly", weekdays: null, times_per_week: 2 });
+  const vacuum = task({ id: "vacuum", repeat: "weekly", weekdays: [], times_per_week: 1, created_at: "2026-11-02T00:00:00Z" });
+
+  it("are never on a specific day's list", () => {
+    expect(isFlexibleWeekly(laundry)).toBe(true);
+    expect(isFlexibleWeekly(task({ repeat: "weekly", weekdays: [5] }))).toBe(false);
+    expect(isDueOn(laundry, FRIDAY)).toBe(false);
+    expect(buildTodayItems([laundry], new Set(), FRIDAY)).toEqual([]);
+  });
+
+  it("count this week's check-offs toward the target", () => {
+    const items = buildWeeklyItems(
+      [laundry, vacuum],
+      [
+        { task_id: "laundry", completed_on: "2026-11-08" }, // last week: ignored
+        { task_id: "laundry", completed_on: "2026-11-10" },
+        { task_id: "vacuum", completed_on: FRIDAY },
+      ],
+      FRIDAY,
+    );
+    const byId = Object.fromEntries(items.map((i) => [i.task.id, i]));
+    expect(byId.laundry).toMatchObject({ count: 1, target: 2, doneToday: false, complete: false });
+    expect(byId.vacuum).toMatchObject({ count: 1, target: 1, doneToday: true, complete: true });
+  });
+
+  it("reset on Monday", () => {
+    const items = buildWeeklyItems(
+      [laundry],
+      [
+        { task_id: "laundry", completed_on: "2026-11-10" },
+        { task_id: "laundry", completed_on: "2026-11-12" },
+      ],
+      "2026-11-16",
+    );
+    expect(items[0]).toMatchObject({ count: 0, complete: false });
+  });
+
+  it("wait for their start date and leave other tasks out", () => {
+    const later = task({ id: "later", repeat: "weekly", weekdays: null, times_per_week: 1, due_date: "2026-11-20" });
+    const daily = task({ id: "daily", repeat: "daily" });
+    expect(buildWeeklyItems([later, daily], [], FRIDAY)).toEqual([]);
+  });
+
+  it("describe their schedule", () => {
+    expect(describeRepeat(laundry)).toBe("Twice a week");
+    expect(describeRepeat(vacuum)).toBe("Once a week");
+    expect(describeRepeat({ repeat: "weekly", weekdays: null, times_per_week: 3 })).toBe("3 times a week");
   });
 });
 

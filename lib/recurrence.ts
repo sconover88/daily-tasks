@@ -1,8 +1,9 @@
-import { weekdayOf } from "./dates";
+import { weekdayOf, weekStart } from "./dates";
 import {
   TIMES_OF_DAY,
   WEEKDAY_FORM_ORDER,
   WEEKDAY_SHORT,
+  type Completion,
   type DateString,
   type Task,
   type TimeOfDay,
@@ -17,6 +18,8 @@ type Schedulable = Pick<Task, "repeat" | "weekdays" | "due_date" | "completed_at
  *   Undated one-time tasks live in the backlog until you pick "Do today".
  * - Daily: every day (from its start date, if it has one).
  * - Weekly: on its chosen weekdays (from its start date, if it has one).
+ * - Weekly with no chosen days: never on a specific day's list. Those live in
+ *   the "This week" section instead (see buildWeeklyItems).
  *
  * Repeating tasks reset on schedule: missed days never pile up.
  */
@@ -64,6 +67,52 @@ export function buildTodayItems(tasks: Task[], doneTodayIds: Set<string>, today:
   return items;
 }
 
+/** A weekly task with no set days: do it N times each week, any days. */
+export function isFlexibleWeekly(task: Pick<Task, "repeat" | "weekdays">): boolean {
+  return task.repeat === "weekly" && (task.weekdays ?? []).length === 0;
+}
+
+export type WeeklyItem = {
+  task: Task;
+  /** Days this Mon–Sun week it's been checked off (today included). */
+  count: number;
+  /** How many times a week it should be done. */
+  target: number;
+  doneToday: boolean;
+  /** Reached the target for this week. */
+  complete: boolean;
+};
+
+/**
+ * The "This week" section: flexible weekly tasks with this week's progress.
+ * The count resets every Monday, and missed weeks don't carry over.
+ *
+ * @param completions completion rows from at least this week's Monday onward
+ */
+export function buildWeeklyItems(
+  tasks: Task[],
+  completions: Pick<Completion, "task_id" | "completed_on">[],
+  today: DateString,
+): WeeklyItem[] {
+  const monday = weekStart(today);
+  const counts = new Map<string, number>();
+  const doneToday = new Set<string>();
+  for (const c of completions) {
+    if (c.completed_on < monday || c.completed_on > today) continue;
+    counts.set(c.task_id, (counts.get(c.task_id) ?? 0) + 1);
+    if (c.completed_on === today) doneToday.add(c.task_id);
+  }
+
+  return tasks
+    .filter((task) => isFlexibleWeekly(task) && !(task.due_date && task.due_date > today))
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    .map((task) => {
+      const count = counts.get(task.id) ?? 0;
+      const target = task.times_per_week ?? 1;
+      return { task, count, target, doneToday: doneToday.has(task.id), complete: count >= target };
+    });
+}
+
 export type TodayGroup = { timeOfDay: TimeOfDay; items: TodayItem[] };
 
 /** Morning, Afternoon, Evening, Anytime; empty groups dropped. Overdue first, then oldest. */
@@ -96,11 +145,21 @@ export function repeatingTasks(tasks: Task[]): Task[] {
   return tasks.filter((t) => t.repeat !== "none").sort((a, b) => a.title.localeCompare(b.title));
 }
 
-/** "Daily", "Weekdays", "Mon, Wed, Fri", "One-time". */
-export function describeRepeat(task: Pick<Task, "repeat" | "weekdays">): string {
+/** "Once a week", "Twice a week", "3 times a week". */
+export function describeTimesPerWeek(times: number): string {
+  if (times === 1) return "Once a week";
+  if (times === 2) return "Twice a week";
+  return `${times} times a week`;
+}
+
+/** "Daily", "Weekdays", "Mon, Wed, Fri", "Twice a week", "One-time". */
+export function describeRepeat(
+  task: Pick<Task, "repeat" | "weekdays"> & { times_per_week?: number | null },
+): string {
   if (task.repeat === "none") return "One-time";
   if (task.repeat === "daily") return "Daily";
   const days = new Set(task.weekdays ?? []);
+  if (days.size === 0) return describeTimesPerWeek(task.times_per_week ?? 1);
   if (days.size === 7) return "Every day";
   if (days.size === 5 && [1, 2, 3, 4, 5].every((d) => days.has(d))) return "Weekdays";
   if (days.size === 2 && days.has(0) && days.has(6)) return "Weekends";

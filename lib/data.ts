@@ -3,7 +3,8 @@ import { db } from "./db";
 import type { Completion, DateString, Task } from "./types";
 import type { TaskInput } from "./validation";
 
-const TASK_COLUMNS = "id, title, notes, category, time_of_day, repeat, weekdays, due_date, completed_at, created_at";
+const TASK_COLUMNS =
+  "id, title, notes, category, time_of_day, repeat, weekdays, times_per_week, due_date, completed_at, created_at";
 
 class DataError extends Error {
   constructor(action: string, cause: { message: string; code?: string }) {
@@ -42,7 +43,8 @@ function toRow(input: TaskInput) {
     category: input.category,
     time_of_day: input.time_of_day,
     repeat: input.repeat,
-    weekdays: input.repeat === "weekly" ? input.weekdays : null,
+    weekdays: input.repeat === "weekly" && input.weekdays.length > 0 ? input.weekdays : null,
+    times_per_week: input.times_per_week,
     due_date: input.due_date,
   };
 }
@@ -103,12 +105,13 @@ export async function undoCompletion(id: string, day: DateString): Promise<void>
   if (reopenError) throw new DataError("undo the check-off", reopenError);
 }
 
-export async function listCompletionsOn(day: DateString): Promise<Completion[]> {
+/** Completion rows on `since` or later (for today's and this week's check-offs). */
+export async function listCompletionsFrom(since: DateString): Promise<Completion[]> {
   const { data, error } = await db()
     .from("completions")
     .select("id, task_id, completed_on, completed_at")
-    .eq("completed_on", day);
-  if (error) throw new DataError("load today's check-offs", error);
+    .gte("completed_on", since);
+  if (error) throw new DataError("load this week's check-offs", error);
   return (data ?? []) as Completion[];
 }
 
