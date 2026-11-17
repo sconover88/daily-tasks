@@ -12,7 +12,7 @@ export function renderIcon(size: number, { rounded = false }: { rounded?: boolea
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#542177",
+          background: "#2563eb",
           borderRadius: rounded ? size * 0.22 : 0,
         }}
       >

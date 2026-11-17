@@ -43,7 +43,7 @@ const text = [
   ["Secondary text", "#454545", "Surface", "#f4f3f4", "16px / 400"],
   ["Muted text", "#5c5c5c", "Page ground", "#fcfcfd", "14px / 500"],
   ["Muted text", "#5c5c5c", "Surface", "#f4f3f4", "13px / 400"],
-  ["Action label", "#fcfcfd", "Action fill", "#542177", "14–16px / 500"],
+  ["Action label", "#fcfcfd", "Action fill", "#2563eb", "14–16px / 500"],
   ["Inverse text", "#fcfcfd", "Accent (Done today)", "#2563eb", "14px / 600"],
   ["Danger text", "#991b1b", "Page ground", "#fcfcfd", "14px / 500"],
   ["Danger text", "#991b1b", "Surface", "#f4f3f4", "13px / 600"],
@@ -53,7 +53,7 @@ const text = [
 const nonText = [
   ["Control edge", "#858585", "Page ground", "#fcfcfd"],
   ["Control edge", "#858585", "Surface", "#f4f3f4"],
-  ["Checked fill", "#542177", "Surface", "#f4f3f4"],
+  ["Checked fill", "#2563eb", "Surface", "#f4f3f4"],
   ["Focus ring", "#141314", "Page ground", "#fcfcfd"],
   ["Focus ring", "#141314", "Surface", "#f4f3f4"],
 ];

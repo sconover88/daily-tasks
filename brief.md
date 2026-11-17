@@ -68,7 +68,7 @@ FEATURES
    as small tags, and flag overdue one-time tasks ("Overdue since Nov 10") in an
    accessible red. Include tasks already checked off today so they can be undone.
 2. Streak panel at the top of Today: the streak number at display size (60px), a
-   "Done today" status badge (the accent blue) once any task is done today, a short
+   "Done today" status badge (blue, with a check icon) once any task is done today, a short
    encouraging message, and "Free skip this week: available/used" (hidden when the
    streak is 0).
 3. Backlog tab: unfinished one-time tasks with no date or a future date (dated
@@ -96,7 +96,7 @@ FEATURES
 7. "This week" section at the bottom of Today (hidden when empty): weekly tasks with
    no set days, each with a today checkbox and "1 of 2 this week" or "Done for the
    week · 2 of 2", plus "N to go" and "Any day works. Resets Monday."
-8. Web app manifest + PNG icons (generated with next/og: a white check on #542177)
+8. Web app manifest + PNG icons (generated with next/og: a white check on #2563eb)
    so it can be added to the home screen. Apple touch icon. No service worker.
 
 RULES
@@ -150,9 +150,9 @@ DATA AND SECURITY
 DESIGN
 Create DESIGN.md at the project root recording these exact specs, then the app rules
 below. Implement the tokens as CSS variables mapped into Tailwind's @theme.
-- Colour. Background: #fcfcfd; Brand colour: #2563eb; Button colour: #542177; Brand
-  colour use: None; Where colour appears: Status only (keep images neutral; use colour
-  only for status, such as success or error).
+- Colour. Background: #fcfcfd; Brand colour: #2563eb; Button colour: #2563eb; Brand
+  colour use: Main colour (buttons, selections, done states); keep images neutral;
+  nothing decorative is coloured.
 - Type. Two sans-serif fonts: Host Grotesk for display, Instrument Sans for body;
   Headline size: 5.0 x body; Headline emphasis: None.
 - Shape. Corners: Round; Button shape: Pill.
@@ -161,7 +161,7 @@ below. Implement the tokens as CSS variables mapped into Tailwind's @theme.
 - Imagery. UI only (no photography); framed.
 - Starting values: page ground #fcfcfd; alternate ground #f4f3f4; primary text
   #141314; secondary text #454545; muted text #5c5c5c; inverse ground #141314; inverse
-  text #fcfcfd; accent #2563eb; primary action fill #542177; primary action label
+  text #fcfcfd; accent #2563eb; primary action fill #2563eb; primary action label
   #fcfcfd; surface #f4f3f4; hairline #dddddd; display type at 1440px: 80px; display
   type at 390px: 60px; body type 16px; display weight 500; container width 1200px;
   page margin 24px; band padding at 1440px top 96px / bottom 64px; band padding at
@@ -170,8 +170,8 @@ below. Implement the tokens as CSS variables mapped into Tailwind's @theme.
 App rules:
 - One background everywhere; cards inset on the surface with 16px corners; no
   dividers (separate with space and surfaces); every control is a pill or circle.
-- Primary action = #542177 fill with a #fcfcfd label (main buttons, add button, active
-  tab, selected pills, checked boxes). The accent blue is ONLY for the "Done today"
+- Primary action = #2563eb fill with a #fcfcfd label (main buttons, add button, active
+  tab, selected pills, checked boxes). The same blue marks the "Done today"
   status. Errors use an accessible red, #991b1b.
 - Inputs and unselected pills need a 3:1 outline: add a "control edge" token
   #858585 (the hairline is too faint for controls).
